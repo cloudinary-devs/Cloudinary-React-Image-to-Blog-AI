@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import CloudinaryUploadWidget from "./CloudinaryUploadWidget";
+import { AdvancedImage } from '@cloudinary/react';
+import { Cloudinary } from "@cloudinary/url-gen";
+import {fill} from "@cloudinary/url-gen/actions/resize";
+import {focusOn} from "@cloudinary/url-gen/qualifiers/gravity";
+import {FocusOn} from "@cloudinary/url-gen/qualifiers/focusOn";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [image, setImage] = useState(null);
+
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: import.meta.env.VITE_CLOUD_NAME
+    }
+  });
+
+  const uwConfig = {
+    cloudName: import.meta.env.VITE_CLOUD_NAME,
+    uploadPreset: "ai-demo",
+    sources: ["local"],
+    multiple: false,
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      {image && 
+        <div className="image">
+          <AdvancedImage cldImg={cld.image(image.public_id).resize(fill().width(500).height(500).gravity(focusOn(FocusOn.faces())))} className="full-image"/>
+        </div>
+      }
+      <CloudinaryUploadWidget uwConfig={uwConfig} setImage={setImage}/>
+    </div>
+  );
 }
 
-export default App
+export default App;
