@@ -1,38 +1,50 @@
 import { useState } from 'react';
-import './App.css';
-import CloudinaryUploadWidget from "./CloudinaryUploadWidget";
-import { AdvancedImage } from '@cloudinary/react';
-import { Cloudinary } from "@cloudinary/url-gen";
-import {fill} from "@cloudinary/url-gen/actions/resize";
-import {focusOn} from "@cloudinary/url-gen/qualifiers/gravity";
-import {FocusOn} from "@cloudinary/url-gen/qualifiers/focusOn";
+import axios from 'axios';
 
-function App() {
+const ImageUpload = () => {
   const [image, setImage] = useState(null);
+  const [caption, setCaption] = useState('');
+  const [error, setError] = useState('');
 
-  const cld = new Cloudinary({
-    cloud: {
-      cloudName: import.meta.env.VITE_CLOUD_NAME
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!image) {
+      alert('Please select an image to upload');
+      return;
     }
-  });
 
-  const uwConfig = {
-    cloudName: import.meta.env.VITE_CLOUD_NAME,
-    uploadPreset: "ai-demo",
-    sources: ["local"],
-    multiple: false,
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+      const response = await axios.post('http://localhost:3000/caption', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setCaption(response.data.info.detection.captioning.data.caption);
+      setError(''); // Clear any previous error messages
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Error uploading image: ' + error.message);
+    }
   };
 
   return (
     <div>
-      {image && 
-        <div className="image">
-          <AdvancedImage cldImg={cld.image(image.public_id).resize(fill().width(500).height(500).gravity(focusOn(FocusOn.faces())))} className="full-image"/>
-        </div>
-      }
-      <CloudinaryUploadWidget uwConfig={uwConfig} setImage={setImage}/>
+      <h1>Image Upload</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <button type="submit">Upload</button>
+      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {caption && <p>Caption: {caption}</p>}
     </div>
   );
-}
+};
 
-export default App;
+export default ImageUpload;
