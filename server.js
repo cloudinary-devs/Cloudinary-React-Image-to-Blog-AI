@@ -79,27 +79,6 @@ app.post("/api/generate-audio", async (req, res) => {
 
 const generateBlog = async(caption) => {
 
-  /*
-    Train the model by giving it some previous conversations
-    */
-  // const demoModel = [
-  //   {
-  //     role: "user",
-  //     content:
-  //       "Generate a 300 word blog post based on the following caption: ",
-  //   },
-  //   {
-  //     role: "assistant",
-  //     content:
-  //       "Perched on a rocky cliff, a man gazes at the ocean's vast expanse and the majestic mountain beyond. The tranquil scene offers a perfect blend of serenity and grandeur, reminding us to pause, reflect, and appreciate nature's beauty amidst our busy lives. Find your own moment of peace today.",
-  //   },
-  // ];
-
-  // const message = {
-  //   role: "user",
-  //   content: `Write a 300 word paper with an introduction, main section and a conclusion based on the following caption of an image: ${caption}`
-  // }
-
   const message = {
     role: "user",
     content: `create an 300 world blog post to be used as part of a marketing campaign from a business-- the blog must focused on the vertical industry of that image based on the following caption of the image: ${caption}. This blog is not for the business but for the person interested in the vetical industry of the image`
